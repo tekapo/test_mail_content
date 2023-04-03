@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress_password
+    ports:
+      - 3306:3306
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 8025:8025
+
+  wordpress:
+    build: .
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress_password
+      WORDPRESS_SMTP_HOST: mailhog
+      WORDPRESS_SMTP_PORT: 1025
+    ports:
+      - 8080:80
+    depends_on:
+      - mysql
