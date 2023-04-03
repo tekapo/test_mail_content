@@ -30,6 +30,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -73,3 +83,11 @@ jobs:
       - name: Test email content
         run: |
           curl -s http://localhost:8025/api/v2/messages | jq '.items[0] | {subject: .Content.Headers.Subject[0], to: "\(.To[0].Mailbox)@\(.To[0].Domain)"}' > email.json
+
+      - name: Get sent email information
+        run: |
+          curl -s http://localhost:8025/api/v2/messages | jq '.items[0] | {subject: .Content.Headers.Subject[0], to: "\(.To[0].Mailbox)@\(.To[0].Domain)"}' > email.json
+
+      - name: Run pytest test script
+        run: |
+          pytest test_email.py

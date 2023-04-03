@@ -1,19 +1,18 @@
-import requests
+# test_email.py
+import json
 
 
-def test_email_subject_and_body():
-    # Get the captured emails from MailHog
-    response = requests.get("http://localhost:8025/api/v2/messages")
-    response_data = response.json()
+def test_email_subject():
+    with open("email.json", "r") as file:
+        email_data = json.load(file)
 
-    # Check that there is at least one email
-    assert len(response_data["items"]) > 0
+    expected_subject = "Your expected email subject"
+    assert email_data["subject"] == expected_subject, f"Expected subject: '{expected_subject}', but got: '{email_data['subject']}'"
 
-    # Get the email subject and body
-    email = response_data["items"][0]
-    email_subject = email["Content"]["Headers"]["Subject"][0]
-    email_body = email["Content"]["Body"]
 
-    # Check the email subject and body
-    assert email_subject == "Expected Subject"
-    assert "Expected content" in email_body
+def test_email_recipient():
+    with open("email.json", "r") as file:
+        email_data = json.load(file)
+
+    expected_recipient = "example@example.com"
+    assert email_data["to"] == expected_recipient, f"Expected recipient: '{expected_recipient}', but got: '{email_data['to']}'"
