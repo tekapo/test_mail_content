@@ -49,38 +49,24 @@ jobs:
 
       - name: Set up WordPress test environment
         run: |
-          svn co https://develop.svn.wordpress.org/tags/5.8.1 /tmp/wordpress-tests-lib
-          echo "define( 'DB_NAME', 'wordpress_test' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'DB_USER', 'root' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'DB_PASSWORD', 'root' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'DB_HOST', '127.0.0.1:3306' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'DB_CHARSET', 'utf8' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'DB_COLLATE', '' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'WP_TESTS_DOMAIN', 'localhost' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'WP_TESTS_EMAIL', 'admin@example.org' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'WP_TESTS_TITLE', 'Test Blog' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'WP_PHP_BINARY', 'php' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'WP_TESTS_TABLE_PREFIX', 'wptests_' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'WPLANG', '' );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'WP_DEBUG', true );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'WP_DEBUG_DISPLAY', false );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "define( 'SCRIPT_DEBUG', true );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-          echo "ini_set( 'display_errors', 0 );" >> /tmp/wordpress-tests-lib/wp-tests-config.php
-
+          # Download and configure WordPress
+          wp core download --path=wordpress
+          wp config create --dbname=wordpress --dbuser=root --dbpass=root --dbhost=localhost --path=wordpress
+          wp core install --url="http://localhost" --title="Test Site" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com" --path=wordpress
 
       - name: Install and activate WP Mail SMTP plugin
         run: |
-          wp plugin install wp-mail-smtp --activate
+          wp plugin install wp-mail-smtp --activate  --path=wordpress
 
       - name: Configure WP Mail SMTP plugin
         run: |
-          wp option update wp_mail_smtp --format=json -- \
+          wp option update wp_mail_smtp --format=json  --path=wordpress \
             '{"mailer": "smtp", "smtp": {"host": "localhost", "port": "1025", "encryption": "", "auth": false}}'
 
       - name: Install and activate test plugin
         run: |
           cp email-test.php wp-content/plugins/
-          wp plugin activate email-test
+          wp plugin activate email-test --path=wordpress
 
       - name: Test email content
         run: |
