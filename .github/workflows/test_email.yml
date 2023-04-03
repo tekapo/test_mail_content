@@ -58,7 +58,7 @@ jobs:
 
       - name: Install and activate WP Mail SMTP plugin
         run: |
-          wp plugin install wp-mail-smtp --activate  --path=wordpress
+          wp plugin install wp-mail-smtp --activate --path=wordpress
 
       - name: Configure WP Mail SMTP plugin
         run: |
@@ -67,7 +67,7 @@ jobs:
 
       - name: Install and activate test plugin
         run: |
-          cp email-test.php wp-content/plugins/
+          cp email-test.php wordpress/wp-content/plugins/
           wp plugin activate email-test --path=wordpress
 
       - name: Test email content
