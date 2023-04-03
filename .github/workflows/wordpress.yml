@@ -9,53 +9,20 @@ on:
       - main
 
 jobs:
-  build-wordpress:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Build WordPress image
-        run: docker build -t my-wordpress .
-
   run-wordpress:
-    needs: build-wordpress
     runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: root_password
-          MYSQL_DATABASE: wordpress
-          MYSQL_USER: wordpress
-          MYSQL_PASSWORD: wordpress_password
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
-      mailhog:
-        image: mailhog/mailhog
-        ports:
-          - 8025:8025
-
-      wordpress:
-        image: my-wordpress
-        env:
-          WORDPRESS_DB_HOST: mysql:3306
-          WORDPRESS_DB_NAME: wordpress
-          WORDPRESS_DB_USER: wordpress
-          WORDPRESS_DB_PASSWORD: wordpress_password
-          WORDPRESS_SMTP_HOST: mailhog
-          WORDPRESS_SMTP_PORT: 1025
-        ports:
-          - 8080:80
-        options: --link mysql:mysql --health-cmd="curl -f http://localhost:80" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Setup Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Start WordPress and services
+        run: docker-compose up -d
 
       - name: Wait for WordPress to be ready
         run: sleep 20
@@ -73,3 +40,6 @@ jobs:
 
       - name: Run E2E tests
         run: npm test
+
+      - name: Cleanup
+        run: docker-compose down
