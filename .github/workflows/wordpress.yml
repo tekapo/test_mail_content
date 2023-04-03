@@ -27,6 +27,11 @@ jobs:
       - name: Wait for WordPress to be ready
         run: sleep 20
 
+      - name: Set up WordPress and activate WP MailHog SMTP plugin
+        run: |
+          wp core install --url=http://localhost:8080 --title="My WordPress Site" --admin_user=admin --admin_password=admin_password --admin_email=admin@example.com --path=/usr/src/wordpress --allow-root --skip-email
+          wp plugin activate wp-mailhog-smtp --path=/usr/src/wordpress --allow-root
+
       # - name: Install WP-CLI
       #   run: |
       #     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar

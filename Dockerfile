@@ -9,7 +9,7 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
     chmod +x wp-cli.phar && \
     mv wp-cli.phar /usr/local/bin/wp
 
-# Install WP Mail SMTP plugin
-RUN curl -L https://downloads.wordpress.org/plugin/wp-mail-smtp.zip -o wp-mail-smtp.zip \
-    && unzip wp-mail-smtp.zip -d /usr/src/wordpress/wp-content/plugins \
-    && rm wp-mail-smtp.zip
+# Install WP MailHog SMTP plugin
+RUN curl -L https://downloads.wordpress.org/plugin/wp-mailhog-smtp.zip -o wp-mailhog-smtp.zip && \
+    unzip wp-mailhog-smtp.zip -d /usr/src/wordpress/wp-content/plugins && \
+    rm wp-mailhog-smtp.zip
