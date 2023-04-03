@@ -27,11 +27,11 @@ jobs:
       - name: Wait for WordPress to be ready
         run: sleep 20
 
-      - name: Install WP-CLI
-        run: |
-          curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-          chmod +x wp-cli.phar
-          sudo mv wp-cli.phar /usr/local/bin/wp
+      # - name: Install WP-CLI
+      #   run: |
+      #     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+      #     chmod +x wp-cli.phar
+      #     sudo mv wp-cli.phar /usr/local/bin/wp
 
       - name: Install WordPress and create admin user
         run: |
