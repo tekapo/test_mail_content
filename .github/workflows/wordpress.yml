@@ -9,39 +9,61 @@ on:
       - main
 
 jobs:
-  run-wordpress:
+  build-wordpress:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup Docker
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
+      - name: Build WordPress image
+        run: docker build -t my-wordpress .
 
-      - name: Start WordPress and services
-        run: docker-compose up -d
+  run-wordpress:
+    needs: build-wordpress
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: wordpress
+          MYSQL_USER: wordpress
+          MYSQL_PASSWORD: wordpress_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      mailhog:
+        image: mailhog/mailhog
+        ports:
+          - 8025:8025
+
+      wordpress:
+        image: wordpress:latest
+        env:
+          WORDPRESS_DB_HOST: mysql:3306
+          WORDPRESS_DB_NAME: wordpress
+          WORDPRESS_DB_USER: wordpress
+          WORDPRESS_DB_PASSWORD: wordpress_password
+          WORDPRESS_SMTP_HOST: mailhog
+          WORDPRESS_SMTP_PORT: 1025
+        ports:
+          - 8080:80
+        options: --link mysql:mysql --health-cmd="curl -f http://localhost:80" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Wait for WordPress to be ready
         run: sleep 20
 
       - name: Set up WordPress and activate WP MailHog SMTP plugin
         run: |
-          wp core install --url=http://localhost:8080 --title="My WordPress Site" --admin_user=admin --admin_password=admin_password --admin_email=admin@example.com --path=/usr/src/wordpress --allow-root --skip-email
-          wp plugin activate wp-mailhog-smtp --path=/usr/src/wordpress --allow-root
-
-      # - name: Install WP-CLI
-      #   run: |
-      #     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-      #     chmod +x wp-cli.phar
-      #     sudo mv wp-cli.phar /usr/local/bin/wp
-
-      - name: Install WordPress and create admin user
-        run: |
-          wp core install --url=http://localhost:8080 --title="My WordPress Site" --admin_user=admin --admin_password=admin_password --admin_email=admin@example.com --path=/usr/src/wordpress --allow-root --skip-email
-          sleep 5
+          docker exec wordpress-service wp core install --url=http://localhost:8080 --title="My WordPress Site" --admin_user=admin --admin_password=admin_password --admin_email=admin@example.com --path=/usr/src/wordpress --allow-root --skip-email
+          docker exec wordpress-service wp plugin activate wp-mailhog-smtp --path=/usr/src/wordpress --allow-root
 
       - name: Check WordPress site
         run: curl http://localhost:8080
@@ -56,13 +78,3 @@ jobs:
 
       - name: Run E2E tests
         run: npm test
-
-      - name: Upload screenshot as artifact
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: screenshots
-          path: registration_success.png
-
-      - name: Cleanup
-        run: docker-compose down
