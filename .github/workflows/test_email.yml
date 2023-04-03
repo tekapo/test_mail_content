@@ -108,6 +108,10 @@ jobs:
       - name: Run MailHog Logs script
         run: python mailhog_logs.py
 
+      # - name: Run pytest test script
+      #   run: |
+      #     pytest test_email.py
+
       - name: Run pytest test script
         run: |
-          pytest test_email.py
+          pytest test_mail.py
