@@ -52,5 +52,12 @@ jobs:
       - name: Run E2E tests
         run: npm test
 
+      - name: Upload screenshot as artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: screenshots
+          path: registration_success.png
+
       - name: Cleanup
         run: docker-compose down
