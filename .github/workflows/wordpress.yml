@@ -1,0 +1,64 @@
+name: Run WordPress on GitHub Actions
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-wordpress:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: wordpress
+          MYSQL_USER: wordpress
+          MYSQL_PASSWORD: wordpress_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      mailhog:
+        image: mailhog/mailhog
+        ports:
+          - 8025:8025
+
+      wordpress:
+        build: .
+        env:
+          WORDPRESS_DB_HOST: mysql:3306
+          WORDPRESS_DB_NAME: wordpress
+          WORDPRESS_DB_USER: wordpress
+          WORDPRESS_DB_PASSWORD: wordpress_password
+          WORDPRESS_SMTP_HOST: mailhog
+          WORDPRESS_SMTP_PORT: 1025
+        ports:
+          - 8080:80
+        options: --link mysql:mysql --health-cmd="curl -f http://localhost:80" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Wait for WordPress to be ready
+        run: sleep 20
+
+      - name: Check WordPress site
+        run: curl http://localhost:8080
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run E2E tests
+        run: npm test
