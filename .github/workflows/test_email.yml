@@ -70,32 +70,40 @@ jobs:
           wp config create --dbname=wordpress --dbuser=root --dbpass=root --dbhost=127.0.0.1:3306 --path=wordpress
           wp core install --url="http://localhost" --title="Test Site" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com" --path=wordpress
 
-
-      - name: Install and activate WP Mail SMTP plugin
+      # Install wp-mailhog-smtp plugin
+      - name: Install and activate wp-mailhog-smtp plugin
         run: |
-          wp plugin install wp-mail-smtp --activate --path=wordpress
+          wp plugin install wp-mailhog-smtp --activate --path=wordpress
 
-      - name: Configure WP Mail SMTP plugin
-        run: |
-          wp option update wp_mail_smtp --format=json  --path=wordpress \
-            '{"mailer": "smtp", "smtp": {"host": "localhost", "port": "1025", "encryption": "", "auth": false}}'
+      # - name: Install and activate WP Mail SMTP plugin
+      #   run: |
+      #     wp plugin install wp-mail-smtp --activate --path=wordpress
+
+      # - name: Configure WP Mail SMTP plugin
+      #   run: |
+      #     wp option update wp_mail_smtp --format=json  --path=wordpress \
+      #       '{"mailer": "smtp", "smtp": {"host": "localhost", "port": "1025", "encryption": "", "auth": false}}'
 
       - name: Install and activate test plugin
         run: |
           cp email-test.php wordpress/wp-content/plugins/
           wp plugin activate email-test --path=wordpress
 
-      - name: Echo received email content
+      - name: Add a new user
         run: |
-          curl -s http://localhost:8025/api/v2/messages | jq '.items[0].Content.Body' | tr -d '\"' | base64 --decode
+          wp user create test test@example.com --role=administrator --user_pass=test --path=wordpress
 
-      - name: Test email content
-        run: |
-          curl -s http://localhost:8025/api/v2/messages | jq '.items[0] | {subject: .Content.Headers.Subject[0], to: "\(.To[0].Mailbox)@\(.To[0].Domain)"}' > email.json
+      # - name: Echo received email content
+      #   run: |
+      #     curl -s http://localhost:8025/api/v2/messages | jq '.items[0].Content.Body' | tr -d '\"' | base64 --decode
 
-      - name: Get sent email information
-        run: |
-          curl -s http://localhost:8025/api/v2/messages | jq '.items[0] | {subject: .Content.Headers.Subject[0], to: "\(.To[0].Mailbox)@\(.To[0].Domain)"}' > email.json
+      # - name: Test email content
+      #   run: |
+      #     curl -s http://localhost:8025/api/v2/messages | jq '.items[0] | {subject: .Content.Headers.Subject[0], to: "\(.To[0].Mailbox)@\(.To[0].Domain)"}' > email.json
+
+      # - name: Get sent email information
+      #   run: |
+      #     curl -s http://localhost:8025/api/v2/messages | jq '.items[0] | {subject: .Content.Headers.Subject[0], to: "\(.To[0].Mailbox)@\(.To[0].Domain)"}' > email.json
 
       - name: Run MailHog Logs script
         run: python mailhog_logs.py
