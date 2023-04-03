@@ -96,6 +96,10 @@ jobs:
       - name: Send email using WordPress
         run: php send-email.php
 
+      - name: wget https://your-wordpress-site.com/wp-cron.php
+        run: |
+          wget http://localhost/wordpress/wp-cron.php > /dev/null 2>&1
+
       # - name: Echo received email content
       #   run: |
       #     curl -s http://localhost:8025/api/v2/messages | jq '.items[0].Content.Body' | tr -d '\"' | base64 --decode
