@@ -25,6 +25,6 @@ def test_send_email():
     assert msg["From"]["Mailbox"] == "sender"
     assert msg["From"]["Domain"] == "example.com"
     assert msg["To"][0]["Mailbox"] == "recipient"
-    assert msg["To"][0]["Domain"] == "example.com"
+    assert msg["To"][0]["Domain"] == "example.comm"
     assert msg["Content"]["Headers"]["Subject"][0] == subject
     assert msg["Content"]["Body"] == body
