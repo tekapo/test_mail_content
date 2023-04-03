@@ -98,7 +98,7 @@ jobs:
 
       - name: wget https://your-wordpress-site.com/wp-cron.php
         run: |
-          wget http://localhost/wordpress/wp-cron.php > /dev/null 2>&1
+          wget http://localhost/wordpress/wp-cron.php
 
       # - name: Echo received email content
       #   run: |
