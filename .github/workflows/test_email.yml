@@ -85,6 +85,10 @@ jobs:
           cp email-test.php wordpress/wp-content/plugins/
           wp plugin activate email-test --path=wordpress
 
+      - name: Echo received email content
+        run: |
+          curl -s http://localhost:8025/api/v2/messages | jq '.items[0].Content.Body' | tr -d '\"' | base64 --decode
+
       - name: Test email content
         run: |
           curl -s http://localhost:8025/api/v2/messages | jq '.items[0] | {subject: .Content.Headers.Subject[0], to: "\(.To[0].Mailbox)@\(.To[0].Domain)"}' > email.json
