@@ -97,6 +97,9 @@ jobs:
         run: |
           curl -s http://localhost:8025/api/v2/messages | jq '.items[0] | {subject: .Content.Headers.Subject[0], to: "\(.To[0].Mailbox)@\(.To[0].Domain)"}' > email.json
 
+      - name: Run MailHog Logs script
+        run: python mailhog_logs.py
+
       - name: Run pytest test script
         run: |
           pytest test_email.py
