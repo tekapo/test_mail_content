@@ -9,7 +9,18 @@ on:
       - main
 
 jobs:
+  build-wordpress:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build WordPress image
+        run: docker build -t my-wordpress .
+
   run-wordpress:
+    needs: build-wordpress
     runs-on: ubuntu-latest
 
     services:
@@ -30,7 +41,7 @@ jobs:
           - 8025:8025
 
       wordpress:
-        build: .
+        image: my-wordpress
         env:
           WORDPRESS_DB_HOST: mysql:3306
           WORDPRESS_DB_NAME: wordpress
