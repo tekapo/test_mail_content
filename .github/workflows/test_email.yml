@@ -93,11 +93,15 @@ jobs:
         run: |
           wp user create test test@example.com --role=administrator --user_pass=test --path=wordpress
 
-      - name: Send email using WordPress
-        run: php send-email.php
+      # - name: Send email using WordPress
+      #   run: php send-email.php
 
       - name: Run WP-Cron
         run: php wordpress/wp-cron.php
+
+      - name: Pause for 3 seconds
+        run: sleep 3
+
 
       # - name: Echo received email content
       #   run: |
@@ -120,4 +124,4 @@ jobs:
 
       - name: Run pytest test script
         run: |
-          pytest test_mail.py
+          pytest test_email.py
