@@ -62,8 +62,9 @@ jobs:
 
       - name: Set up WordPress and activate WP MailHog SMTP plugin
         run: |
-          docker exec wordpress-service wp core install --url=http://localhost:8080 --title="My WordPress Site" --admin_user=admin --admin_password=admin_password --admin_email=admin@example.com --path=/usr/src/wordpress --allow-root --skip-email
-          docker exec wordpress-service wp plugin activate wp-mailhog-smtp --path=/usr/src/wordpress --allow-root
+          docker exec wordpress wp core install --url=http://localhost:8080 --title="My WordPress Site" --admin_user=admin --admin_password=admin_password --admin_email=admin@example.com --path=/usr/src/wordpress --allow-root --skip-email
+          docker exec wordpress wp plugin activate wp-mailhog-smtp --path=/usr/src/wordpress --allow-root
+
 
       - name: Check WordPress site
         run: curl http://localhost:8080
