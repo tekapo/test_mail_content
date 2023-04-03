@@ -93,6 +93,9 @@ jobs:
         run: |
           wp user create test test@example.com --role=administrator --user_pass=test --path=wordpress
 
+      - name: Send email using WordPress
+        run: php send-email.php
+
       # - name: Echo received email content
       #   run: |
       #     curl -s http://localhost:8025/api/v2/messages | jq '.items[0].Content.Body' | tr -d '\"' | base64 --decode
