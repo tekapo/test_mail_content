@@ -1,7 +1,7 @@
 <?php
 // send-email.php
 
-require_once('wp-load.php');
+require_once('wordpress/wp-load.php');
 
 $to = 'recipient@example.com';
 $subject = 'Test Email';
